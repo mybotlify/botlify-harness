@@ -63,7 +63,29 @@ export class MemorySystem {
   }
 
   async logToSupabase(entry) {
-    // TODO: Implement Supabase logging
+    if (!this.config.supabaseUrl || !this.config.supabaseKey) return;
+    
+    try {
+      const response = await fetch(`${this.config.supabaseUrl}/rest/v1/context_log`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': this.config.supabaseKey,
+          'Authorization': `Bearer ${this.config.supabaseKey}`,
+        },
+        body: JSON.stringify({
+          content: typeof entry.data === 'string' ? entry.data : JSON.stringify(entry.data),
+          entry_type: entry.category,
+          created_at: entry.timestamp,
+        }),
+      });
+      
+      if (!response.ok) {
+        console.error('Supabase log failed:', response.status);
+      }
+    } catch (err) {
+      console.error('Supabase error:', err.message);
+    }
   }
 
   // Auto-capture patterns

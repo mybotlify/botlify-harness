@@ -14,7 +14,7 @@ import { renderDashboard } from './ui/dashboard.js';
 class BotlifyHarness {
   constructor(config = {}) {
     this.config = {
-      port: config.port || 3000,
+      port: config.port || process.env.PORT || 3000,
       ...config,
     };
 
@@ -23,7 +23,7 @@ class BotlifyHarness {
     this.context = new ContextManager(config.context);
     this.skills = new SkillsEngine(config.skills);
     this.router = new ModelRouter(config.router);
-    this.watchdog = new Watchdog(config.watchdog);
+    this.watchdog = new Watchdog({ ...config.watchdog, command: config.watchdog?.command || 'echo' });
     this.hooks = new HooksEngine();
 
     // Setup built-in hooks
@@ -132,8 +132,14 @@ class BotlifyHarness {
   }
 
   start() {
-    // Start watchdog
-    this.watchdog.start();
+    // Start watchdog (optional - only if command exists)
+    if (this.config.watchdog?.enabled !== false) {
+      try {
+        this.watchdog.start();
+      } catch (e) {
+        console.log('⚠️ Watchdog disabled (managed process not found)');
+      }
+    }
 
     // Start API server
     this.app.listen(this.config.port, () => {

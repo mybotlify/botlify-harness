@@ -32,10 +32,16 @@ export class Watchdog extends EventEmitter {
 
     this.emit('spawning', { command: this.command, args: this.args });
     
-    this.process = spawn(this.command, this.args, {
-      stdio: 'pipe',
-      env: process.env,
-    });
+    try {
+      this.process = spawn(this.command, this.args, {
+        stdio: 'pipe',
+        env: process.env,
+      });
+    } catch (err) {
+      this.emit('error', err);
+      this.enabled = false;
+      return;
+    }
 
     this.process.stdout.on('data', (data) => {
       this.emit('stdout', data.toString());
@@ -52,6 +58,10 @@ export class Watchdog extends EventEmitter {
 
     this.process.on('error', (err) => {
       this.emit('error', err);
+      if (err.code === 'ENOENT') {
+        this.enabled = false;
+        return;
+      }
       this.handleError(err);
     });
   }
