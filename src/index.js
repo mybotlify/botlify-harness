@@ -5,6 +5,8 @@
 import express from 'express';
 import { MemorySystem } from './core/memory.js';
 import { ContextManager } from './core/context.js';
+import { SkillsEngine } from './core/skills.js';
+import { ModelRouter } from './core/router.js';
 import { Watchdog } from './watchdog/index.js';
 import { HooksEngine, builtInHooks } from './hooks/index.js';
 
@@ -18,6 +20,8 @@ class BotlifyHarness {
     // Core systems
     this.memory = new MemorySystem(config.memory);
     this.context = new ContextManager(config.context);
+    this.skills = new SkillsEngine(config.skills);
+    this.router = new ModelRouter(config.router);
     this.watchdog = new Watchdog(config.watchdog);
     this.hooks = new HooksEngine();
 
