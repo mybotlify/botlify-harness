@@ -9,6 +9,7 @@ import { SkillsEngine } from './core/skills.js';
 import { ModelRouter } from './core/router.js';
 import { Watchdog } from './watchdog/index.js';
 import { HooksEngine, builtInHooks } from './hooks/index.js';
+import { renderDashboard } from './ui/dashboard.js';
 
 class BotlifyHarness {
   constructor(config = {}) {
@@ -53,6 +54,12 @@ class BotlifyHarness {
 
   setupAPI() {
     this.app.use(express.json());
+
+    // Dashboard
+    this.app.get('/', async (req, res) => {
+      const data = await this.getDashboardData();
+      res.send(renderDashboard(data));
+    });
 
     // Health check
     this.app.get('/health', (req, res) => {
@@ -99,6 +106,16 @@ class BotlifyHarness {
       context: this.context.getSummary(),
       watchdog: this.watchdog.getStatus(),
       timestamp: new Date().toISOString(),
+    };
+  }
+
+  async getDashboardData() {
+    return {
+      watchdog: this.watchdog.getStatus(),
+      context: this.context.getSummary(),
+      skills: this.skills.getSkills(),
+      memory: { count: this.memory.shortTerm.size },
+      activity: [],
     };
   }
 
