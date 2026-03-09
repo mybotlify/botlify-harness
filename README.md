@@ -8,6 +8,10 @@ Production infrastructure for Botlify AI agents.
 - **Context Manager** — Auto-save at 70%, warn at 80%
 - **Watchdog** — Self-healing with crash recovery
 - **Hooks Engine** — Event-driven automation
+- **Skills Engine** — Progressive disclosure architecture
+- **Model Router** — Cost-aware intelligent routing
+- **Reflexion Engine** — Self-improvement through critique
+- **Web Dashboard** — Browser-based control panel
 
 ## Quick Start
 
